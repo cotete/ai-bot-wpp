@@ -33,23 +33,37 @@ client.on('ready', async () => {
 });
 
 const getClient = async () => {
-    const users = await axios.get('https://api-atendimentos.onrender.com/usuarios.json');
-    const user = users.data.find(user => user.numero === phoneNumber);
-    return user;
+    try {
+        const response = await axios.get('https://api-atendimentos.onrender.com/usuarios.json');
+        const users = response.data;
+        const user = users.find(user => user.numero === phoneNumber);
+        return user;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return null;
+    }
 }
 
-const postMessage = async (message, numero,respostaIa) => {
-    const user = await getClient();
-    const data = {
-        mensagem: message,
-        usuario_id: user.id,
-        status_chat: true,
-        nm_cliente: user.nome,
-        nr_cliente: numero,
-        reposta_ia: respostaIa,
-    };
-    const response = await axios.post('https://api-atendimentos.onrender.com/mensagens.json', data);
-    return response;
+const postMessage = async (message, numero, respostaIa) => {
+    try {
+        const user = await getClient();
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const data = {
+            mensagem: message,
+            usuario_id: user.id,
+            status_chat: true,
+            nm_cliente: user.nome,
+            nr_cliente: numero,
+            reposta_ia: respostaIa,
+        };
+        const response = await axios.post('https://api-atendimentos.onrender.com/mensagens.json', data);
+        return response;
+    } catch (error) {
+        console.error('Error posting message:', error);
+        return null;
+    }
 }
 
 client.on('qr', qr => {
