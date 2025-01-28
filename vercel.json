@@ -1,10 +1,1 @@
-{
-    "version": 2,
-    "builds": [
-      { "src": "index.js", "use": "@vercel/node" }
-    ],
-    "routes": [
-      { "src": "/qr", "dest": "/index.js" },
-      { "src": "/(.*)", "dest": "/index.js" }
-    ]
-  }
+{ "version": 2, "rewrites": [{ "source": "/qr", "destination": "/index.js" },{ "source": "/(.*)", "destination": "/index.js" }] }
