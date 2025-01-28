@@ -5,14 +5,18 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
 const express = require('express');
 const axios = require('axios');
-
+const puppeteer = require('puppeteer');
 const apiKey = process.env.API_KEY;
 
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const client = new Client({
-    authStrategy: new NoAuth()
+    authStrategy: new NoAuth(),
+    puppeteer: {
+        executablePath: '/usr/bin/chromium-browser',
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
 });
 
 let qrCodeData = '';
