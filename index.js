@@ -28,6 +28,26 @@ client.on('ready', async () => {
     }
 });
 
+const getClient = async () => {
+    const users = await axios.get('https://api-atendimentos.onrender.com/usuarios.json');
+    const user = users.data.find(user => user.numero === phoneNumber);
+    return user;
+}
+
+const postMessage = async (message, numero,respostaIa) => {
+    const user = await getClient();
+    const data = {
+        mensagem: message,
+        usuario_id: user.id,
+        status_chat: true,
+        nm_cliente: user.nome,
+        nr_cliente: numero,
+        reposta_ia: respostaIa,
+    };
+    const response = await axios.post('https://api-atendimentos.onrender.com/mensagens.json', data);
+    return response;
+}
+
 client.on('qr', qr => {
     qrCodeData = qr;
     qrcode.generate(qr, {small: true});
@@ -39,6 +59,7 @@ client.on('message_create', async message => {
 
     const prompt = `Faça uma resposta como se você fosse um assistente de uma empresa, respondendo para que setor essa mensagem seria direcionada: "${message.body}", exemplo de mensagem que você deve enviar: "Redirecionando você ao seter (nome do setor)..."`;
     const result = await model.generateContent(prompt);
+    await postMessage(message.body, message.getContact(), result);
     message.reply(result);
 });
 
@@ -61,5 +82,6 @@ app.get('/qr', (req, res) => {
         res.send('QR code not available yet');
     }
 });
+
 
 module.exports = app;
