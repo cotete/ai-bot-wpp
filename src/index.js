@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({path:'../.env'});
 const { Client, NoAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
