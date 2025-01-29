@@ -2,12 +2,14 @@
   "name": "api-zapzap",
   "version": "1.0.0",
   "main": "src/index.js",
-  "engines": { "node": "22.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
     "build": "echo 'No build step required'",
-    "vercel-build":"echo 'No build step required'"
+    "vercel-build": "echo 'No build step required'"
   },
   "keywords": [],
   "author": "",
@@ -15,12 +17,13 @@
   "description": "",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "chrome-aws-lambda": "^10.1.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "puppeteer": "^24.1.1",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.26.0"
+    "whatsapp-web.js": "^1.23.0"
   }
 }
