@@ -27,6 +27,10 @@ const getClient = async () => {
 }
 
 function createClient(clientId) {
+
+    if (clients[clientId]) {
+        return clients[clientId];
+    }
     const client = new Client({
         authStrategy: new LocalAuth({
             clientId: clientId 
