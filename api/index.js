@@ -1,5 +1,5 @@
 require('dotenv').config({path:'../.env'});
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, RemoteAuth  } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
@@ -11,8 +11,21 @@ const puppeteer = require('puppeteer');
 const cors = require('cors');
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const { MongoStore } = require('wwebjs-mongo');
+const mongoose = require('mongoose');
 const clients = {};
 let qrCodes = {};
+
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Conectado ao MongoDB');
+}).catch(err => {
+    console.error('Erro ao conectar ao MongoDB', err);
+});
 
 
 const getClient = async () => {
@@ -103,14 +116,19 @@ app.post('/user', async (req, res) => {
     if (clients[user.id]) {
         return clients[user.id];
     }
+    const store = new MongoStore({ mongoose: mongoose });
+
     const client = new Client({
-        authStrategy: new LocalAuth({
-            clientId: user.id 
+        authStrategy: new RemoteAuth({
+            clientId: user.id,
+            store: store,
+            backupSyncIntervalMs: 300000
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         }
     });
+
 
     client.on('qr', (qr) => {
         console.log(`QR Code para ${user.id}:`, qr);
@@ -135,10 +153,10 @@ app.post('/user', async (req, res) => {
 
     if (client) {
         res.status(201).json({ message: 'User created', client });
-        return client;
+        
     }else
         res.status(500).json({ message: 'User not created'});
-        return null;
+        
 });
 
 app.get('/user', async (req, res) => {
