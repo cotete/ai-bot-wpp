@@ -93,13 +93,14 @@ app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
     const user = req.body;
+    console.log(user)
     
     if (clients[user.id]) {
         return clients[user.id];
     }
     const client = new Client({
         authStrategy: new LocalAuth({
-            clientId: clientId 
+            clientId: user.id 
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -108,7 +109,7 @@ app.post('/user', async (req, res) => {
 
     client.on('qr', (qr) => {
         console.log(`QR Code para ${user.id}:`, qr);
-        qrCodes[clientId] = qr;
+        qrCodes[user.id] = qr;
     });
 
     client.on('ready', () => {
