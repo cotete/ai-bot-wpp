@@ -8,6 +8,7 @@ const axios = require('axios');
 const apiKey = process.env.API_KEY;
 const chromium = require('chrome-aws-lambda');
 const puppeteer = require('puppeteer');
+const cors = require('cors');
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 const clients = {};
@@ -88,6 +89,7 @@ const postMessage = async (clientId, message, numero, respostaIa) => {
 
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));

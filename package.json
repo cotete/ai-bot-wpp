@@ -17,8 +17,9 @@
   "description": "",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
-    "chrome-aws-lambda": "^10.1.0",
     "axios": "^1.7.9",
+    "chrome-aws-lambda": "^10.1.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "puppeteer": "^24.1.1",
