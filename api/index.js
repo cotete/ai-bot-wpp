@@ -20,14 +20,13 @@ if (!apiKey || !mongoURI) {
     process.exit(1);
 }
 
-mongoose.connect(mongoURI, {
+const con = mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log(mongoURI)
     console.log('Conectado ao MongoDB');
 }).catch(err => {
-    console.log(mongoURI)
+    
     console.error('Erro ao conectar ao MongoDB', err);
 });
 
@@ -113,6 +112,7 @@ app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
     console.log(req.body)
+    let qrCodetemp = null;
     const { nome, email, senha, numero, descricao, tipo_de_envio } = req.body;
     const user = { id: numero, nome, email, senha, descricao, tipo_de_envio };
     console.log(user)
@@ -121,6 +121,7 @@ app.post('/user', async (req, res) => {
         res.status(200).json({ message: 'User already exists' });
     }
     const store = new MongoStore({ mongoose: mongoose,collectionName: 'qrcodes' });
+    console.log(store["Collection"])
 
     const client = new Client({
         authStrategy: new RemoteAuth({
@@ -137,6 +138,7 @@ app.post('/user', async (req, res) => {
 
     client.on('qr', (qr) => {
         console.log(`QR Code para ${user.id}:`, qr);
+        qrCodetemp = qr;
         qrCodes[user.id] = qr;
     });
 
@@ -153,11 +155,11 @@ app.post('/user', async (req, res) => {
         message.reply(result);
     });
 
-    client.initialize();
-    clients[user.id] = client;
+    await client.initialize();
 
     if (client) {
-        res.status(201).json({ message: 'User created', clientId: user.id });
+        user.qrCode = qrCodetemp;
+        res.status(201).json(user);
         
     }else
         res.status(500).json({ message: 'User not created'});
