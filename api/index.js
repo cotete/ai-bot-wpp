@@ -93,13 +93,54 @@ app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
     const user = req.body;
-    const newClient = createClient(user.id);
-    if (newClient) {
+    
+    if (clients[user.id]) {
+        return clients[user.id];
+    }
+    const client = new Client({
+        authStrategy: new LocalAuth({
+            clientId: clientId 
+        }),
+        puppeteer: {
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        }
+    });
+
+    client.on('qr', (qr) => {
+        console.log(`QR Code para ${user.id}:`, qr);
+        qrCodes[clientId] = qr;
+    });
+
+    client.on('ready', () => {
+        console.log(`Cliente ${user.id} está pronto.`);
+    });
+
+    client.on('message_create', async message => {
+        console.log('New message received', message);
+    
+        const prompt = `Faça uma resposta como se você fosse um assistente de uma empresa, respondendo para que setor essa mensagem seria direcionada: "${message.body}", exemplo de mensagem que você deve enviar: "Redirecionando você ao seter (nome do setor)..."`;
+        const result = await model.generateContent(prompt);
+        await postMessage(user.id, message.body, message.getContact(), result);
+        message.reply(result);
+    });
+
+    client.initialize();
+    clients[user.id] = client;
+
+    if (client) {
         res.status(201).send('User created');
-        return newClient;
+        return client;
     }else
         res.status(500).send('Error creating user');
         return null;
+});
+
+app.get('/user', async (req, res) => {
+    if (user) {
+        res.status(200).send(clients);
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 
 
