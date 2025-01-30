@@ -31,55 +31,6 @@ const con = mongoose.connect(mongoURI, {
 });
 
 
-const getClient = async () => {
-    try {
-        const response = await axios.get('https://api-atendimentos.onrender.com/usuarios.json');
-        const users = response.data;
-        const user = users.find(user => user.numero === phoneNumber);
-        return user;
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        return null;
-    }
-}
-
-function createClient(clientId) {
-
-    if (clients[clientId]) {
-        return clients[clientId];
-    }
-    const client = new Client({
-        authStrategy: new LocalAuth({
-            clientId: clientId 
-        }),
-        puppeteer: {
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        }
-    });
-
-    client.on('qr', (qr) => {
-        console.log(`QR Code para ${clientId}:`, qr);
-        qrCodes[clientId] = qr;
-    });
-
-    client.on('ready', () => {
-        console.log(`Cliente ${clientId} está pronto.`);
-    });
-
-    client.on('message_create', async message => {
-        console.log('New message received', message);
-    
-        const prompt = `Faça uma resposta como se você fosse um assistente de uma empresa, respondendo para que setor essa mensagem seria direcionada: "${message.body}", exemplo de mensagem que você deve enviar: "Redirecionando você ao seter (nome do setor)..."`;
-        const result = await model.generateContent(prompt);
-        await postMessage(clientId, message.body, message.getContact(), result);
-        message.reply(result);
-    });
-
-    client.initialize();
-    clients[clientId] = client; 
-    return client;
-}
-
 const postMessage = async (clientId, message, numero, respostaIa) => {
     try {
         const user = clients[clientId];
@@ -105,7 +56,12 @@ const postMessage = async (clientId, message, numero, respostaIa) => {
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization'], 
+    credentials: true, 
+  }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -120,7 +76,7 @@ app.post('/user', async (req, res) => {
     if (clients[user.id]) {
         res.status(200).json({ message: 'User already exists' });
     }
-    const store = new MongoStore({ mongoose: mongoose, collectionName: 'sessions'  });
+    const store = new MongoStore({ mongoose: mongoose, collectionName: 'qrcodes'  });
 
     const client = new Client({
         authStrategy: new RemoteAuth({
