@@ -1,5 +1,5 @@
 require('dotenv').config({path:'../.env'});
-const { Client, NoAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
@@ -88,10 +88,12 @@ const postMessage = async (clientId, message, numero, respostaIa) => {
 
 
 const app = express();
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
+    console.log(req.body)
     const { nome, email, senha, numero, descricao, tipo_de_envio } = req.body;
     const user = { id: numero, nome, email, senha, descricao, tipo_de_envio };
     console.log(user)
@@ -164,5 +166,5 @@ app.get('/qr/:clientId', (req, res) => {
     }
 });
 
-
 module.exports = app;
+
