@@ -130,7 +130,8 @@ app.post('/user', async (req, res) => {
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        }
+        },
+        webCache:null
     });
 
 
