@@ -92,7 +92,8 @@ const app = express();
 app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
-    const user = req.body;
+    const { nome, email, senha, numero, descricao, tipo_de_envio } = req.body;
+    const user = { id: numero, nome, email, senha, descricao, tipo_de_envio };
     console.log(user)
     
     if (clients[user.id]) {
@@ -138,7 +139,7 @@ app.post('/user', async (req, res) => {
 
 app.get('/user', async (req, res) => {
     if (user) {
-        res.status(200).send(clients);
+        res.status(200).send(JSON.parse(clients));
     } else {
         res.status(404).send('User not found');
     }
