@@ -1,13 +1,10 @@
-require('dotenv').config({path:'../.env'});
+require('dotenv').config({path: __dirname + '/.env'});
 const { Client, LocalAuth, RemoteAuth  } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
 const express = require('express');
 const axios = require('axios');
 const apiKey = process.env.API_KEY;
-const chromium = require('chrome-aws-lambda');
-const puppeteer = require('puppeteer');
 const cors = require('cors');
 const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -18,12 +15,19 @@ let qrCodes = {};
 
 const mongoURI = process.env.MONGO_URI;
 
+if (!apiKey || !mongoURI) {
+    console.error('Erro: Variáveis de ambiente não carregadas corretamente.');
+    process.exit(1);
+}
+
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
+    console.log(mongoURI)
     console.log('Conectado ao MongoDB');
 }).catch(err => {
+    console.log(mongoURI)
     console.error('Erro ao conectar ao MongoDB', err);
 });
 
@@ -114,7 +118,7 @@ app.post('/user', async (req, res) => {
     console.log(user)
     
     if (clients[user.id]) {
-        return clients[user.id];
+        res.status(200).json({ message: 'User already exists' });
     }
     const store = new MongoStore({ mongoose: mongoose });
 
@@ -152,7 +156,7 @@ app.post('/user', async (req, res) => {
     clients[user.id] = client;
 
     if (client) {
-        res.status(201).json({ message: 'User created', client });
+        res.status(201).json({ message: 'User created', clientId: user.id });
         
     }else
         res.status(500).json({ message: 'User not created'});
@@ -184,6 +188,11 @@ app.get('/qr/:clientId', (req, res) => {
     } else {
         res.send('QR code not available yet');
     }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
