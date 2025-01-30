@@ -95,10 +95,10 @@ app.post('/user', async (req, res) => {
     const user = req.body;
     const newClient = createClient(user.id);
     if (newClient) {
-        res.send('User created');
+        res.status(201).send('User created');
         return newClient;
     }else
-        res.send('Error creating user');
+        res.status(500).send('Error creating user');
         return null;
 });
 
