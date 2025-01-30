@@ -173,19 +173,7 @@ app.get('/user', async (req, res) => {
 
 
 app.get('/qr', (req, res) => {
-    const clientId = req.query.clientId;
-    const qr = qrCodes[clientId];
-    if (qr) {
-        QRCode.toDataURL(qr, (err, url) => {
-            if (err) {
-                res.status(500).json({ message: 'Error generating QR code'});
-            } else {
-                res.json({ qrCodes });
-            }
-        });
-    } else {
-        res.status(404).json({ message: 'QR code not available yet'});
-    }
+    res.json(qrCodes);
 });
 
 app.get('/qr/:clientId', (req, res) => {
