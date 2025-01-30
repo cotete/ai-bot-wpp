@@ -134,18 +134,18 @@ app.post('/user', async (req, res) => {
     clients[user.id] = client;
 
     if (client) {
-        res.status(201).send('User created');
+        res.status(201).json({ message: 'User created', client });
         return client;
     }else
-        res.status(500).send('Error creating user');
+        res.status(500).json({ message: 'User not created'});
         return null;
 });
 
 app.get('/user', async (req, res) => {
     if (user) {
-        res.status(200).send(JSON.parse(clients));
+        res.status(200).json(JSON.parse(clients));
     } else {
-        res.status(404).send('User not found');
+        res.status(404).json({ message: 'User not found'});
     }
 });
 
@@ -158,7 +158,7 @@ app.get('/qr/:clientId', (req, res) => {
     if (qr) {
         QRCode.toDataURL(qr, (err, url) => {
             if (err) {
-                res.status(500).send('Error generating QR code');
+                res.status(500).json({ message: 'Error generating QR code'});
             } else {
                 res.send(`<img src="${url}" alt="QR Code" />`);
             }
