@@ -74,12 +74,17 @@ app.post('/user', async (req, res) => {
     }
     const store = new MongoStore({ mongoose: mongoose, collection : 'CodigosQR' });
 
+    const authDir = path.join('/tmp', '.wwebjs_auth');
+    if (!fs.existsSync(authDir)) {
+        fs.mkdirSync(authDir, { recursive: true });
+    }
+
     const client = new Client({
         authStrategy: new RemoteAuth({
             clientId: user.id,
             store: store,
             backupSyncIntervalMs: 300000,
-            dataPath: __dirname + '/data',
+            dataPath: authDir,
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -110,14 +115,19 @@ app.post('/user', async (req, res) => {
         message.reply(result);
     });
 
-    await client.initialize();
-
-    if (client) {
-        user.qrCode = qrCodetemp;
-        res.status(201).json(user);
-        
-    }else
-        res.status(500).json({ message: 'User not created'});
+    try {
+        await client.initialize();
+    
+        if (client) {
+            user.qrCode = qrCodetemp;
+            res.status(201).json(user);
+        } else {
+            res.status(500).json({ message: 'User not created' });
+        }
+    } catch (err) {
+        console.error('Erro ao inicializar o cliente WhatsApp:', err);
+        res.status(500).json({ message: 'Erro ao inicializar o cliente WhatsApp' });
+    }
         
 });
 
