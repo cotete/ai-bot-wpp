@@ -85,7 +85,7 @@ app.post('/user', async (req, res) => {
 
     let executablePath;
         try {
-            executablePath = await chromium.executablePath;
+            executablePath = '/usr/bin/chromium-browser';
             if (!executablePath) {
                 throw new Error('Falha ao obter o caminho do Chromium');
             }
@@ -102,6 +102,8 @@ app.post('/user', async (req, res) => {
             dataPath: authDir,
         }),
         puppeteer: {
+            headless: true,
+            executablePath: executablePath,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         },
         webCache:null
