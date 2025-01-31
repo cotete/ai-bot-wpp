@@ -15,6 +15,7 @@ const mongoose = require('mongoose');
 const clients = {};
 let qrCodes = {};
 const chromium = require('chrome-aws-lambda');
+const puppeteer = require('puppeteer-core');
 
 const mongoURI = process.env.MONGO_URI;
 
@@ -82,6 +83,17 @@ app.post('/user', async (req, res) => {
         fs.mkdirSync(authDir, { recursive: true });
     }
 
+    let executablePath;
+        try {
+            executablePath = await chromium.executablePath;
+            if (!executablePath) {
+                throw new Error('Falha ao obter o caminho do Chromium');
+            }
+        } catch (error) {
+            console.error('Falha ao obter o caminho do Chromium', error);
+            return res.status(500).json({ message: 'Falha ao obter o caminho do Chromium' });
+        }
+
     const client = new Client({
         authStrategy: new RemoteAuth({
             clientId: user.id,
@@ -90,7 +102,7 @@ app.post('/user', async (req, res) => {
             dataPath: authDir,
         }),
         puppeteer: {
-            executablePath: await chromium.executablePath,
+            executablePath: executablePath,
             args: chromium.args,
             headless: chromium.headless,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
