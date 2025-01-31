@@ -14,6 +14,7 @@ const { MongoStore } = require('wwebjs-mongo');
 const mongoose = require('mongoose');
 const clients = {};
 let qrCodes = {};
+const chromium = require('chrome-aws-lambda');
 
 const mongoURI = process.env.MONGO_URI;
 
