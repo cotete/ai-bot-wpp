@@ -72,7 +72,7 @@ app.post('/user', async (req, res) => {
     if (clients[user.id]) {
         res.status(200).json({ message: 'User already exists' });
     }
-    const store = new MongoStore({ mongoose: mongoose, collectionName: 'qrcodes'  });
+    const store = new MongoStore({ mongoose: mongoose, collectionName: 'CodigosQR'  });
 
     const client = new Client({
         authStrategy: new RemoteAuth({
