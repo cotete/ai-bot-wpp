@@ -1,5 +1,6 @@
 require('dotenv').config({path: __dirname + '/.env'});
 const path = require('path');
+const fs = require('fs');
 const { Client, LocalAuth, RemoteAuth  } = require('whatsapp-web.js');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
@@ -28,7 +29,7 @@ async function connectToMongoDB() {
         console.log('Conectado ao MongoDB');
     } catch (err) {
         console.error('Erro ao conectar ao MongoDB', err);
-        process.exit(1); // Encerra o processo em caso de erro
+        process.exit(1); 
     }
 }
 
