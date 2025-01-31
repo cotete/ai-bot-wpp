@@ -95,10 +95,8 @@ app.post('/user', async (req, res) => {
         }
 
     const client = new Client({
-        authStrategy: new RemoteAuth({
+        authStrategy: new LocalAuth({
             clientId: user.id,
-            store: store,
-            backupSyncIntervalMs: 300000,
             dataPath: authDir,
         }),
         puppeteer: {
