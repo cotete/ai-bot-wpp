@@ -49,7 +49,7 @@ const postMessage = async (clientId, message, numero, respostaIa) => {
             nr_cliente: numero,
             reposta_ia: respostaIa,
         };
-        const response = await axios.post('https://api-atendimentos.onrender.com/mensagens', data);
+        const response = await axios.post('https://api-atendimentos.onrender.com/chat_clients', data);
         return response;
     } catch (error) {
         console.error('Error posting message:', error);
