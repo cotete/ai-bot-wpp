@@ -23,9 +23,7 @@ if (!apiKey || !mongoURI) {
 
 async function connectToMongoDB() {
     try {
-        await mongoose.connect(mongoURI, {
-            useUnifiedTopology: true
-        });
+        await mongoose.connect(mongoURI);
         console.log('Conectado ao MongoDB');
     } catch (err) {
         console.error('Erro ao conectar ao MongoDB', err);
@@ -80,7 +78,8 @@ app.post('/user', async (req, res) => {
         authStrategy: new RemoteAuth({
             clientId: user.id,
             store: store,
-            backupSyncIntervalMs: 300000
+            backupSyncIntervalMs: 300000,
+            dataPath: __dirname + '/wwebjs_auth',
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
