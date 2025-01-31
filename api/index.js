@@ -20,17 +20,19 @@ if (!apiKey || !mongoURI) {
     process.exit(1);
 }
 
-const con = mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Conectado ao MongoDB');
-}).catch(err => {
-    
-    console.error('Erro ao conectar ao MongoDB', err);
-});
 
-
+async function connectToMongoDB() {
+    try {
+        await mongoose.connect(mongoURI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        console.log('Conectado ao MongoDB');
+    } catch (err) {
+        console.error('Erro ao conectar ao MongoDB', err);
+        process.exit(1); // Encerra o processo em caso de erro
+    }
+}
 
 const postMessage = async (clientId, message, numero, respostaIa) => {
     try {
@@ -64,6 +66,7 @@ app.use(express.static('public'));
 
 app.post('/user', async (req, res) => {
     console.log(req.body)
+    await connectToMongoDB();
     let qrCodetemp = null;
     const { nome, email, senha, numero, descricao, tipo_de_envio } = req.body;
     const user = { id: numero, nome, email, senha, descricao, tipo_de_envio };
