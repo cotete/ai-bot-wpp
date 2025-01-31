@@ -31,6 +31,7 @@ const con = mongoose.connect(mongoURI, {
 });
 
 
+
 const postMessage = async (clientId, message, numero, respostaIa) => {
     try {
         const user = clients[clientId];
@@ -56,12 +57,7 @@ const postMessage = async (clientId, message, numero, respostaIa) => {
 
 
 const app = express();
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // Permite qualquer origem
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-  });
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -90,6 +86,9 @@ app.post('/user', async (req, res) => {
         webCache:null
     });
 
+    client.on('remote_session_saved',  (remoteSession) => {
+        console.log('Remote session saved', remoteSession);
+    });
 
     client.on('qr', (qr) => {
         console.log(`QR Code para ${user.id}:`, qr);
@@ -121,13 +120,6 @@ app.post('/user', async (req, res) => {
         
 });
 
-app.get('/user', async (req, res) => {
-    if (user) {
-        res.status(200).json(JSON.parse(clients));
-    } else {
-        res.status(404).json({ message: 'User not found'});
-    }
-});
 
 
 app.get('/qr', (req, res) => {
