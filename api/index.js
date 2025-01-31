@@ -79,7 +79,7 @@ app.post('/user', async (req, res) => {
             clientId: user.id,
             store: store,
             backupSyncIntervalMs: 300000,
-            dataPath: __dirname + '/wwebjs_auth',
+            dataPath: __dirname + '/data',
         }),
         puppeteer: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
