@@ -102,9 +102,6 @@ app.post('/user', async (req, res) => {
             dataPath: authDir,
         }),
         puppeteer: {
-            executablePath: executablePath,
-            args: chromium.args,
-            headless: chromium.headless,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         },
         webCache:null
