@@ -1,4 +1,5 @@
 require('dotenv').config({path: __dirname + '/.env'});
+const path = require('path');
 const { Client, LocalAuth, RemoteAuth  } = require('whatsapp-web.js');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const QRCode = require('qrcode');
